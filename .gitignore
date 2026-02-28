@@ -1,4 +1,4 @@
 appsettings.json
-/bin
-/obj
-/RehberlikNew.sln
+bin/
+obj/
+
