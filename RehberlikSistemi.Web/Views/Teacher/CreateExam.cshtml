@@ -1,0 +1,47 @@
+@model RehberlikSistemi.Web.Models.Teacher.CreateExamViewModel
+@{
+    ViewData["Title"] = "Sınav Ekle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Yeni Sınav Ekle</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="CreateExam" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <input type="hidden" asp-for="ProfileId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="SubjectId" class="form-label fw-bold"></label>
+                        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.Subjects">
+                            <option value="">-- Ders Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ExamDate" class="form-label fw-bold"></label>
+                        <input asp-for="ExamDate" class="form-control" />
+                        <span asp-validation-for="ExamDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ImportanceLevel" class="form-label fw-bold"></label>
+                        <input asp-for="ImportanceLevel" class="form-control" type="number" min="1" max="5" />
+                        <span asp-validation-for="ImportanceLevel" class="text-danger"></span>
+                        <small class="text-muted">1 (Düşük) ile 5 (Yüksek) arasında değer giriniz.</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="StudentDetail" asp-route-id="@Model.ProfileId" class="btn btn-outline-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+@model IEnumerable<RehberlikSistemi.Web.Core.Entities.ApplicationUser>
+@{
+    ViewData["Title"] = "Öğretmenler";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Öğretmen Listesi</h2>
+            <a asp-action="CreateTeacher" class="btn btn-success">+ Yeni Öğretmen Ekle</a>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Ad Soyad</th>
+                            <th>E-Posta</th>
+                            <th>Kayıt Tarihi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(!Model.Any()) {
+                            <tr><td colspan="4" class="text-center text-muted">Kayıtlı öğretmen bulunamadı.</td></tr>
+                        }
+                        @foreach(var t in Model) {
+                            <tr>
+                                <td>@t.FirstName @t.LastName</td>
+                                <td>@t.Email</td>
+                                <td>@t.CreatedAt.ToShortDateString()</td>
+                                <td>
+                                    <!-- Ek işlemler (Düzenle vb. ileride eklenebilir) -->
+                                    <button class="btn btn-sm btn-outline-primary" disabled>Düzenle</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,101 @@
+@model RehberlikSistemi.Web.Models.Student.StudentAvailabilityViewModel
+@{
+    ViewData["Title"] = "Müsaitlik Durumum";
+}
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Yeni Saat Ekle</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddAvailability" method="post">
+                    <div class="mb-3">
+                        <label asp-for="NewDayOfWeek" class="form-label fw-bold"></label>
+                        <select asp-for="NewDayOfWeek" class="form-select">
+                            <option value="1">Pazartesi</option>
+                            <option value="2">Salı</option>
+                            <option value="3">Çarşamba</option>
+                            <option value="4">Perşembe</option>
+                            <option value="5">Cuma</option>
+                            <option value="6">Cumartesi</option>
+                            <option value="0">Pazar</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NewStartTime" class="form-label fw-bold"></label>
+                            <input asp-for="NewStartTime" type="time" class="form-control" />
+                            <span asp-validation-for="NewStartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NewEndTime" class="form-label fw-bold"></label>
+                            <input asp-for="NewEndTime" type="time" class="form-control" />
+                            <span asp-validation-for="NewEndTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-primary">Müsait Olduğum Zamanlar</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Gün</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Availabilities.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Henüz müsait olduğunuz bir zaman dilimi eklemediniz.</td>
+                                </tr>
+                            }
+                            @foreach (var item in Model.Availabilities)
+                            {
+                                <tr>
+                                    <td class="align-middle fw-medium">
+                                        @switch(item.DayOfWeek) {
+                                            case DayOfWeek.Monday: <span>Pazartesi</span>; break;
+                                            case DayOfWeek.Tuesday: <span>Salı</span>; break;
+                                            case DayOfWeek.Wednesday: <span>Çarşamba</span>; break;
+                                            case DayOfWeek.Thursday: <span>Perşembe</span>; break;
+                                            case DayOfWeek.Friday: <span>Cuma</span>; break;
+                                            case DayOfWeek.Saturday: <span>Cumartesi</span>; break;
+                                            case DayOfWeek.Sunday: <span>Pazar</span>; break;
+                                        }
+                                    </td>
+                                    <td class="align-middle">@item.StartTime.ToString(@"hh\:mm")</td>
+                                    <td class="align-middle">@item.EndTime.ToString(@"hh\:mm")</td>
+                                    <td class="text-end align-middle">
+                                        <form asp-action="DeleteAvailability" method="post" class="d-inline" onsubmit="return confirm('Bu saati silmek istediğinize emin misiniz?');">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

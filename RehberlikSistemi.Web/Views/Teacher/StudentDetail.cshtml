@@ -1,0 +1,445 @@
+@model RehberlikSistemi.Web.Models.Teacher.StudentDetailViewModel
+@{
+    ViewData["Title"] = "Öğrenci Detayı";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>@Model.FullName - Detayları</h2>
+            <div>
+                <a asp-action="EditStudent" asp-route-id="@Model.ProfileId" class="btn btn-outline-primary me-2"><i class="bi bi-pencil"></i> Düzenle</a>
+                <a asp-action="PlanGenerator" asp-route-profileId="@Model.ProfileId" class="btn btn-outline-info me-2"><i class="bi bi-magic"></i> Oto-Plan</a>
+                <a asp-action="Students" class="btn btn-outline-secondary">Öğrencilerime Dön</a>
+            </div>
+        </div>
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-2 mb-md-0">
+                        <span class="text-muted fw-bold">Sınıfı:</span> <span class="badge bg-primary fs-6">@(Model.GradeLevel ?? "Belirtilmedi")</span>
+                    </div>
+                    <div class="col-md-8">
+                        <span class="text-muted fw-bold">Hedef Bölüm:</span> 
+                        <span class="fw-medium text-dark">@(Model.TargetUniversity ?? "Belirtilmedi")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.RequestSuccessMessage))
+{
+    var alertClass = Model.RequestSuccessMessage.StartsWith("Hata") ? "alert-danger" : "alert-success";
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @Model.RequestSuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-4">
+    <!-- Haftalık Takvim (Tam Genişlik) -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm border-info h-100">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-light me-2 fw-bold" onclick="changeWeek(-1)" title="Önceki Hafta">&laquo; Önceki</button>
+                    <h5 class="mb-0 ms-1"><i class="bi bi-calendar-week"></i> <span id="calendar-title">Öğrenci Haftalık Takvimi</span></h5>
+                </div>
+                <div class="d-flex align-items-center">
+                    <small id="calendar-dates" class="me-3 fw-bold">Yükleniyor...</small>
+                    <button type="button" class="btn btn-sm btn-light fw-bold" onclick="changeWeek(1)" title="Sonraki Hafta">Sonraki &raquo;</button>
+                    <button type="button" class="btn btn-sm btn-outline-light ms-2 fw-bold" onclick="changeWeek(0)" title="Bugüne Dön">Bugün</button>
+                </div>
+            </div>
+            <div class="card-body p-2" id="calendar-body">
+                <div class="text-center py-5 text-muted">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <div class="mt-2">Takvim verisi yükleniyor...</div>
+                </div>
+            </div>
+            <div class="card-footer bg-white text-muted" style="font-size: 0.75rem;">
+                * Sadece kırmızı çarpı uyarısı almamak için müsait saatlerin (yeşil kutular) içine ve tanımlı derslerin çakışmayacağı zamanlara plan ekleyiniz. Sınavlar mor renk ile gösterilir.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ders Planla Modal -->
+<div class="modal fade" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-white border-bottom-0 pb-0">
+                <h4 class="modal-title fw-bold text-dark" id="planModalLabel">Ders Planla</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <form asp-action="CreateStudyTask" method="post" id="planForm">
+                    <input type="hidden" asp-for="ProfileId" id="modalProfileId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="SubjectId" class="form-label fw-bold text-dark">Ders</label>
+                        <select asp-for="SubjectId" class="form-select border-1" asp-items="ViewBag.Subjects" id="modalSubjectId">
+                            <option value="">-- Ders Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ScheduledDate" class="form-label fw-bold text-dark">Planlanan Tarih</label>
+                        <input asp-for="ScheduledDate" class="form-control" id="modalScheduledDate" />
+                        <span asp-validation-for="ScheduledDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label asp-for="StartTime" class="form-label fw-bold text-dark">Başlangıç</label>
+                            <input asp-for="StartTime" class="form-control" id="modalStartTime" />
+                            <span asp-validation-for="StartTime" class="text-danger small"></span>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label asp-for="EndTime" class="form-label fw-bold text-dark">Bitiş</label>
+                            <input asp-for="EndTime" class="form-control" id="modalEndTime" />
+                            <span asp-validation-for="EndTime" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4 mb-2">
+                        <button type="submit" class="btn py-2 text-dark fw-bold" style="background-color: #ffc107; border-radius: 8px;">Planı Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sınavlar -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100 border-primary">
+            <div class="card-header bg-white border-primary d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-primary fw-bold">Sınavlar</h5>
+                <a asp-action="CreateExam" asp-route-profileId="@Model.ProfileId" class="btn btn-sm btn-outline-primary">+ Sınav</a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if(!Model.Exams.Any()) {
+                        <li class="list-group-item text-center text-muted py-4">Kayıtlı sınav bulunmuyor.</li>
+                    }
+                    @foreach(var exam in Model.Exams) {
+                        <li class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">@exam.Subject.Name</h6>
+                                <small class="text-muted">Önem: @exam.ImportanceLevel/5</small>
+                            </div>
+                            <div class="d-flex w-100 justify-content-between align-items-center mt-1">
+                                <p class="mb-1 fw-bold text-dark">@exam.ExamDate.ToString("dd.MM.yyyy")</p>
+                                
+                                <div>
+                                    @if(exam.Score.HasValue) {
+                                        <a asp-action="SetExamScore" asp-route-id="@exam.Id" asp-route-profileId="@Model.ProfileId" class="badge bg-info text-decoration-none me-2">Puan: @exam.Score</a>
+                                    } else {
+                                        <a asp-action="SetExamScore" asp-route-id="@exam.Id" asp-route-profileId="@Model.ProfileId" class="btn btn-sm btn-outline-info py-0 px-2 me-2" style="font-size: 0.75rem;">Sonuç</a>
+                                    }
+                                    
+                                    <form asp-action="DeleteExam" method="post" class="d-inline" onsubmit="return confirm('Bu sınavı silmek istediğinize emin misiniz?');">
+                                        <input type="hidden" name="id" value="@exam.Id" />
+                                        <input type="hidden" name="profileId" value="@Model.ProfileId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-1">Sil</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Haftalık İlerleme (Otomatik Hedefler) -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100 border-success">
+            <div class="card-header bg-white border-success d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-success fw-bold">Haftalık İlerleme Durumu</h5>
+                <span class="badge bg-success">Haftalık Plan</span>
+            </div>
+            <div class="card-body">
+                @if(!Model.AutomatedTargets.Any()) {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-info-circle fs-2 d-block mb-2"></i>
+                        Bu hafta için henüz bir ders planlanmamış. İlerlemeyi görmek için plan oluşturun.
+                    </div>
+                }
+                @foreach(var target in Model.AutomatedTargets) {
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark">@target.SubjectName</span>
+                            <span class="text-muted small">@target.CompletedHours / @target.PlannedHours Saat</span>
+                        </div>
+                        <div class="progress" style="height: 12px; border-radius: 6px;">
+                            @{
+                                var progressColor = target.ProgressPercentage < 30 ? "danger" : (target.ProgressPercentage < 70 ? "warning" : "success");
+                            }
+                            <div class="progress-bar bg-@progressColor progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" 
+                                 style="width: @target.ProgressPercentage%" 
+                                 aria-valuenow="@target.ProgressPercentage" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                @target.ProgressPercentage%
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer bg-light border-0 small text-muted">
+                * Bu veriler oluşturulan haftalık ders programına ve öğrencinin tamamladığı görevlere göre otomatik hesaplanır.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        const profileId = @Model.ProfileId;
+        let currentDateOffset = new Date('@Model.WeekStartDate.ToString("yyyy-MM-dd")T12:00:00'); 
+
+        const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+        const csDaysMap = [1, 2, 3, 4, 5, 6, 0]; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchSchedule(currentDateOffset);
+        });
+
+        function openPlanModal(date, start, end) {
+            document.getElementById("modalScheduledDate").value = date;
+            document.getElementById("modalStartTime").value = start;
+            document.getElementById("modalEndTime").value = end;
+            
+            let modal = new bootstrap.Modal(document.getElementById('planModal'));
+            modal.show();
+        }
+
+        function changeWeek(direction) {
+            if (direction === 0) {
+                currentDateOffset = new Date();
+            } else {
+                currentDateOffset.setDate(currentDateOffset.getDate() + (direction * 7));
+            }
+            fetchSchedule(currentDateOffset);
+        }
+
+        function dtToString(d) {
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            let year = d.getFullYear();
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+            return [year, month, day].join('-');
+        }
+        
+        function formatShortDate(isoStr) {
+            let [y,m,d] = isoStr.split('-');
+            return `${d}.${m}`;
+        }
+        
+        function parseTime(t) {
+            let parts = t.split(':');
+            return new Date(1970,0,1, parts[0], parts[1]);
+        }
+
+        function setFormDate(dateStr) {
+            // Deprecated - using modal instead
+        }
+
+        function generateCalendarHtml(data) {
+            let startDStr = data.weekStartDate;
+            let endDStr = data.weekEndDate;
+            let startD = new Date(startDStr + "T12:00:00");
+            
+            document.getElementById("calendar-dates").innerText = `${formatShortDate(startDStr)} - ${formatShortDate(endDStr)}`;
+            
+            let gridHtml = `<div class="row gx-2 h-100">`;
+            let todayStr = dtToString(new Date());
+
+            for (let i = 0; i < 7; i++) {
+                let cellDate = new Date(startD);
+                cellDate.setDate(cellDate.getDate() + i);
+                let cellDateStr = dtToString(cellDate);
+                
+                let isToday = (todayStr === cellDateStr);
+                let headerClass = isToday ? "bg-primary text-white shadow" : "bg-light";
+                let dayName = dayNames[cellDate.getDay()];
+                let currentSystemDay = csDaysMap[i]; // (1=Mon..0=Sun)
+                
+                gridHtml += `
+                <div class="col" style="min-width: 120px;" onclick="setFormDate('${cellDateStr}')" style="cursor: pointer;">
+                    <div class="card h-100 border-0 rounded-0" style="background-color: #fcfcfc;">
+                        <div class="card-header text-center p-1 ${headerClass} position-relative">
+                            <div class="fw-bold small">${dayName}</div>
+                            <div style="font-size: 0.75rem;">${formatShortDate(cellDateStr)}</div>
+                            ${cellDateStr > todayStr ? `
+                            <form action="/Teacher/ClearDayTasks" method="post" class="position-absolute top-0 end-0 mt-1 me-1" onsubmit="return confirm('${dayName} gününe ait TÜM PLANLANMIŞ (onaysız) dersleri silmek istediğinize emin misiniz?');">
+                                <input type="hidden" name="date" value="${cellDateStr}" />
+                                <input type="hidden" name="profileId" value="${profileId}" />
+                                <button type="submit" class="btn btn-link link-light p-0 border-0" title="Günü Temizle"><i class="bi bi-trash fs-6"></i></button>
+                            </form>` : ''}
+                        </div>
+                        <div class="card-body p-1" style="overflow-y: auto; max-height: 500px;">
+                `;
+                
+                // Exams logic
+                let dayExams = data.exams.filter(e => e.date === cellDateStr).sort((a,b) => a.time.localeCompare(b.time));
+                if (dayExams.length > 0) {
+                     gridHtml += `<div class="fw-bold text-purple mb-1 mt-1 border-bottom pb-1" style="font-size: 0.75rem; color:#6f42c1;">Sınavlar:</div>`;
+                     for(let ex of dayExams) {
+                          gridHtml += `
+                          <div class="bg-purple bg-opacity-10 shadow-sm border rounded p-1 mb-2" style="font-size: 0.75rem; border-color: #6f42c1; background-color: #f3f0ff;">
+                              <div class="fw-bold" style="color:#6f42c1;">${ex.subjectName}</div>
+                              <div class="text-muted" style="font-size: 0.65rem;">${ex.time}</div>
+                          </div>`;
+                     }
+                }
+
+                let dayAvails = data.availabilities.filter(a => a.dayOfWeek === currentSystemDay && a.isAvailable).sort((a,b) => a.startTime.localeCompare(b.startTime));
+                let dayTasks = data.tasks.filter(t => t.date === cellDateStr).sort((a,b) => a.startTime.localeCompare(b.startTime));
+                
+                if (dayAvails.length === 0 && dayTasks.length === 0) {
+                    gridHtml += `<div class="text-muted text-center mt-3" style="font-size: 0.7rem; font-style: italic;">Müsaitlik Yok</div>`;
+                } else {
+                    for(let avail of dayAvails) {
+                        gridHtml += `
+                        <div class="mb-3">
+                            <div class="fw-bold border-bottom border-2 border-success text-success mb-2 pb-1" style="font-size: 0.75rem;">
+                                ${avail.startTime} - ${avail.endTime}
+                            </div>
+                        `;
+                        
+                        let aStart = parseTime(avail.startTime);
+                        let aEnd = parseTime(avail.endTime);
+                        
+                        let tasksInThisAvail = dayTasks.filter(t => {
+                            let tStart = parseTime(t.startTime);
+                            let tEnd = parseTime(t.endTime);
+                            return (tStart < aEnd && tEnd > aStart);
+                        }).sort((a, b) => a.startTime.localeCompare(b.startTime));
+                        
+                        let currentTime = aStart;
+
+                        for (let t of tasksInThisAvail) {
+                            let tStart = parseTime(t.startTime);
+                            let tEnd = parseTime(t.endTime);
+
+                            // Gap before task
+                            if (tStart > currentTime && cellDateStr > todayStr) {
+                                let gapStart = currentTime.toTimeString().substring(0, 5);
+                                let gapEnd = tStart.toTimeString().substring(0, 5);
+                                gridHtml += `
+                                <div class="border border-success bg-success bg-opacity-10 text-success rounded p-1 text-center mb-1" 
+                                     style="font-size: 0.65rem; border-style: dashed !important; cursor: pointer;"
+                                     onclick="openPlanModal('${cellDateStr}', '${gapStart}', '${gapEnd}')">
+                                    + Boşluk: ${gapStart}-${gapEnd}
+                                </div>`;
+                            }
+
+                            // Render Task
+                            let isDone = t.status === "Completed";
+                            let bgClass = isDone ? "bg-success bg-opacity-25 border-success" : "bg-warning bg-opacity-25 border-warning";
+                            let txtClass = isDone ? "text-success" : "text-dark";
+                            gridHtml += `
+                            <div class="${bgClass} border rounded p-1 mb-1 shadow-sm position-relative" style="font-size: 0.75rem;">
+                                <div class="fw-bold ${txtClass} text-truncate pe-3" title="${t.subjectName}">
+                                  ${isDone ? '<i class="bi bi-check2-all"></i>' : ''} ${t.subjectName}
+                                </div>
+                                <div class="text-muted" style="font-size: 0.65rem; white-space: nowrap;">${t.startTime}-${t.endTime}</div>
+                                
+                                ${(!isDone && cellDateStr > todayStr) ? `
+                                <form action="/Teacher/DeleteStudyTask" method="post" class="position-absolute top-0 end-0 mt-1 me-1" onsubmit="return confirm('Bu çalışma planını silmek istiyor musunuz?');">
+                                    <input type="hidden" name="id" value="${t.id}" />
+                                    <input type="hidden" name="profileId" value="${profileId}" />
+                                    <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Görevi Sil"><i class="bi bi-trash"></i></button>
+                                </form>` : ''}
+                            </div>`;
+                            
+                            currentTime = tEnd > currentTime ? tEnd : currentTime;
+                        }
+
+                        // Gap after last task
+                        if (currentTime < aEnd && cellDateStr > todayStr) {
+                            let gapStart = currentTime.toTimeString().substring(0, 5);
+                            let gapEnd = aEnd.toTimeString().substring(0, 5);
+                            gridHtml += `
+                            <div class="border border-success bg-success bg-opacity-10 text-success rounded p-1 text-center" 
+                                 style="font-size: 0.65rem; border-style: dashed !important; cursor: pointer;"
+                                 onclick="openPlanModal('${cellDateStr}', '${gapStart}', '${gapEnd}')">
+                                + Boşluk: ${gapStart}-${gapEnd}
+                            </div>`;
+                        }
+                        
+                        gridHtml += `</div>`; // end avail wrap
+                    }
+                    
+                    // Out of bounds tasks check
+                    let outOfBoundsTasks = dayTasks.filter(t => {
+                        let tStart = parseTime(t.startTime);
+                        let tEnd = parseTime(t.endTime);
+                        return !dayAvails.some(a => {
+                            let aStart = parseTime(a.startTime);
+                            let aEnd = parseTime(a.endTime);
+                            return (tStart < aEnd && tEnd > aStart);
+                        });
+                    });
+                    
+                    if (outOfBoundsTasks.length > 0) {
+                         gridHtml += `<div class="fw-bold text-danger mt-2 mb-1 border-bottom border-danger pb-1" style="font-size: 0.75rem;">Müsaitlik Dışı:</div>`;
+                         for(let t of outOfBoundsTasks) {
+                             gridHtml += `
+                                <div class="bg-danger bg-opacity-10 border border-danger rounded p-1 mb-1 shadow-sm position-relative" style="font-size: 0.75rem;">
+                                    <div class="fw-bold text-danger pe-3">${t.subjectName}</div>
+                                    <div class="text-muted" style="font-size: 0.65rem;">${t.startTime}-${t.endTime}</div>
+
+                                    ${(cellDateStr > todayStr) ? `
+                                    <form action="/Teacher/DeleteStudyTask" method="post" class="position-absolute top-0 end-0 mt-1 me-1" onsubmit="return confirm('Bu hatalı planı silmek istiyor musunuz?');">
+                                        <input type="hidden" name="id" value="${t.id}" />
+                                        <input type="hidden" name="profileId" value="${profileId}" />
+                                        <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Görevi Sil"><i class="bi bi-trash"></i></button>
+                                    </form>` : ''}
+                                </div>`;
+                         }
+                    }
+                }
+                
+                gridHtml += `
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
+            gridHtml += `</div>`;
+            return gridHtml;
+        }
+
+        function fetchSchedule(targetDate) {
+            let container = document.getElementById("calendar-body");
+            container.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <div class="mt-2">Takvim güncelleniyor...</div>
+                </div>`;
+                
+            let ds = dtToString(targetDate);
+            fetch(`/Teacher/GetWeeklySchedule?profileId=${profileId}&date=${ds}`)
+              .then(resp => resp.json())
+              .then(data => {
+                  container.innerHTML = generateCalendarHtml(data);
+              })
+              .catch(err => {
+                  console.error(err);
+                  container.innerHTML = `<div class="alert alert-danger m-3">Takvim yüklenirken hata oluştu. Lütfen sayfayı yenileyin.</div>`;
+              });
+        }
+    </script>
+}

@@ -1,0 +1,39 @@
+@using RehberlikSistemi.Web.Core.Entities
+@model Subject
+@{
+    ViewData["Title"] = "Yeni Ders Ekle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Sisteme Yeni Ders Tanımla</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="CreateSubject" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Ders Adı</label>
+                        <input asp-for="Name" class="form-control" placeholder="Örn: Matematik, Fizik, Türkçe..." />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="SubjectType" class="form-label fw-bold">Ders Türü Katogorisi</label>
+                        <select asp-for="SubjectType" class="form-select" asp-items="Html.GetEnumSelectList<RehberlikSistemi.Web.Core.Enums.SubjectType>()">
+                            <option value="">-- Lütfen Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="SubjectType" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Subjects" class="btn btn-outline-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">Dersi Sisteme Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

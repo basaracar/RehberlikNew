@@ -1,0 +1,50 @@
+@model RehberlikSistemi.Web.Models.Teacher.CreateWeeklyTargetViewModel
+@{
+    ViewData["Title"] = "Haftalık Hedef Ekle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Haftalık Hedef Ekle</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="CreateWeeklyTarget" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <input type="hidden" asp-for="ProfileId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="SubjectId" class="form-label fw-bold"></label>
+                        <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.Subjects">
+                            <option value="">-- Ders Seçiniz --</option>
+                        </select>
+                        <span asp-validation-for="SubjectId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="WeekStartDate" class="form-label fw-bold"></label>
+                        <input asp-for="WeekStartDate" class="form-control" />
+                        <span asp-validation-for="WeekStartDate" class="text-danger"></span>
+                        <small class="text-muted">Lütfen ilgili haftanın Pazartesi gününü seçin.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TargetHours" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <input asp-for="TargetHours" class="form-control" type="number" min="1" max="100" />
+                            <span class="input-group-text">Saat</span>
+                        </div>
+                        <span asp-validation-for="TargetHours" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="StudentDetail" asp-route-id="@Model.ProfileId" class="btn btn-outline-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

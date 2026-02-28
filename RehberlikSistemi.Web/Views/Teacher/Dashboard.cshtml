@@ -1,0 +1,238 @@
+@using RehberlikSistemi.Web.Models.Teacher
+@model TeacherDashboardViewModel
+@{
+    ViewData["Title"] = "Öğretmen Paneli";
+}
+
+<div class="container-fluid p-0">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">Öğretmen Paneli</h2>
+            <p class="text-muted mb-0">Tekrar hoş geldiniz, Sn. <span class="fw-bold text-primary">@Model.TeacherFullName</span>. İşte öğrencilerinizin özeti.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="bi bi-download"></i> Haftalık Rapor
+            </button>
+            <a asp-action="UnassignedStudents" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-person-plus-fill"></i> Öğrenci Ekle
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards Section -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-people-fill text-primary fs-4"></i>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success">+5%</span>
+                    </div>
+                    <p class="text-muted small mb-1">Toplam Öğrenci</p>
+                    <h3 class="fw-bold mb-0">@Model.TotalStudents</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-info bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-graph-up-arrow text-info fs-4"></i>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success">+12%</span>
+                    </div>
+                    <p class="text-muted small mb-1">Ort. Tamamlama</p>
+                    <h3 class="fw-bold mb-0">%@Model.AverageCompletionRate.ToString("F1")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-danger bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                        </div>
+                        <span class="badge bg-danger bg-opacity-10 text-danger">-3%</span>
+                    </div>
+                    <p class="text-muted small mb-1">Riskli Öğrenciler</p>
+                    <h3 class="fw-bold mb-0">@Model.AtRiskStudentsCount</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-success bg-opacity-10 p-2 rounded">
+                            <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                        </div>
+                        <span class="badge bg-success bg-opacity-10 text-success">+8%</span>
+                    </div>
+                    <p class="text-muted small mb-1">Aylık Hedefler</p>
+                    <h3 class="fw-bold mb-0">@Model.MonthlyGoalCount</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Recent Student Progress Table -->
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Son Öğrenci İlerlemesi</h5>
+                    <a asp-action="Students" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-bold">Tümünü Gör</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="text-muted small fw-bold">
+                                    <th class="ps-4">ÖĞRENCİ</th>
+                                    <th>PLAN TAMAMLAMA</th>
+                                    <th>DURUM</th>
+                                    <th class="text-center pe-4">İŞLEMLER</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.RecentStudents.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">Henüz atanmış öğrenci verisi bulunmuyor.</td>
+                                    </tr>
+                                }
+                                @foreach (var student in Model.RecentStudents)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center overflow-hidden" style="width: 40px; height: 40px;">
+                                                    @if (!string.IsNullOrEmpty(student.ProfileImageUrl))
+                                                    {
+                                                        <img src="@student.ProfileImageUrl" alt="Profil" class="w-100 h-100 object-fit-cover">
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-person-fill text-secondary"></i>
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">@student.FullName</div>
+                                                    <div class="text-muted small">@student.GradeLevel</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="progress flex-grow-1" style="height: 6px;">
+                                                    <div class="progress-bar bg-@student.StatusClass" role="progressbar" style="width: @student.CompletionRate.ToString("F0")%" aria-valuenow="@student.CompletionRate" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <span class="small fw-bold">@student.CompletionRate.ToString("F0")%</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-@student.StatusClass bg-opacity-10 text-@student.StatusClass px-3 py-2 rounded-3">@student.Status</span>
+                                        </td>
+                                        <td class="text-center pe-4">
+                                            <div class="dropdown">
+                                                <button class="btn btn-link text-muted p-0" type="button" id="studentAction@student.ProfileId" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="studentAction@student.ProfileId">
+                                                    <li><a class="dropdown-item" asp-action="StudentDetail" asp-route-id="@student.ProfileId"><i class="bi bi-eye me-2"></i> Detay</a></li>
+                                                    <li><a class="dropdown-item" asp-action="EditStudent" asp-route-id="@student.ProfileId"><i class="bi bi-pencil me-2"></i> Düzenle</a></li>
+                                                    <li><a class="dropdown-item" asp-action="PlanGenerator" asp-route-profileId="@student.ProfileId"><i class="bi bi-magic me-2"></i> Plan Üret</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activities Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0">Son Aktiviteler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        @if (!Model.RecentActivities.Any())
+                        {
+                            <p class="text-muted text-center py-4">Son aktivite bulunmuyor.</p>
+                        }
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <div class="d-flex gap-3 mb-4 last-child-mb-0">
+                                <div class="bg-@activity.ColorClass bg-opacity-10 d-flex align-items-center justify-content-center rounded" style="width: 40px; height: 40px; min-width: 40px;">
+                                    <i class="bi @activity.IconClass text-@activity.ColorClass"></i>
+                                </div>
+                                <div class="flex-grow-1 border-bottom-light pb-3 h-100 d-flex flex-column justify-content-center">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h6 class="fw-bold text-dark mb-1">@activity.Title</h6>
+                                        <small class="text-muted" style="font-size: 0.7rem;">@activity.TimeAgo</small>
+                                    </div>
+                                    <p class="text-muted small mb-0">@activity.Description</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="mt-2 text-center">
+                        <button class="btn btn-link btn-sm text-decoration-none text-muted fw-bold">Tüm Kaydı Gör</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Cards -->
+    <div class="row g-4">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm text-white overflow-hidden h-100 position-relative" style="background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+                <div class="card-body p-4 p-lg-5 position-relative z-index-1">
+                    <h3 class="fw-bold mb-3">Otomatik Ders Planları</h3>
+                    <p class="mb-4 opacity-75 fw-light fs-5" style="max-width: 450px;">Öğrencinin deneme sonuçlarına ve hedeflediği bölümlere göre kişiselleştirilmiş öğrenme yolları oluşturun.</p>
+                    <button class="btn btn-light text-primary fw-bold px-4 py-2 rounded-2">Yeni Plan Üret</button>
+                </div>
+                <!-- Decorative background icon -->
+                <i class="bi bi-gear-fill position-absolute bottom-0 end-0 opacity-10" style="font-size: 10rem; transform: translate(20%, 20%);"></i>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm h-100 bg-light-blue">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    <h5 class="fw-bold text-dark mb-3">Yardıma mı ihtiyacınız var?</h5>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="d-flex position-relative">
+                            <img src="https://ui-avatars.com/api/?name=Destek+Ekibi&background=0d6efd&color=fff" class="rounded-circle border border-white" style="width: 32px; height: 32px;" alt="U1">
+                            <img src="https://ui-avatars.com/api/?name=Teknik+Destek&background=6c757d&color=fff" class="rounded-circle border border-white position-absolute" style="width: 32px; height: 32px; left: 16px;" alt="U2">
+                        </div>
+                        <div class="ms-3 pt-1">
+                            <div class="fw-medium text-dark small">Teknik Destek Çevrimiçi</div>
+                            <a href="#" class="text-primary small text-decoration-none fw-bold">Canlı Destek Başlat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-light-blue { background-color: #f0f7ff; }
+    .border-bottom-light { border-bottom: 1px solid #f1f1f1; }
+    .last-child-mb-0:last-child { border-bottom: none !important; margin-bottom: 0 !important; }
+    .activity-timeline .flex-grow-1 { min-height: 48px; }
+    .z-index-1 { z-index: 1; }
+</style>

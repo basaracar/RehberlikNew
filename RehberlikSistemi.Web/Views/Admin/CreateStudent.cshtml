@@ -1,0 +1,69 @@
+@using RehberlikSistemi.Web.Models.Admin
+@model StudentViewModel
+@{
+    ViewData["Title"] = "Yeni Öğrenci Ekle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Yeni Öğrenci Ekle</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="CreateStudent" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-bold"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-bold"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label fw-bold"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Varsayılan: Ogrenci123!" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="GradeLevel" class="form-label fw-bold"></label>
+                            <input asp-for="GradeLevel" class="form-control" placeholder="Örn: 12. Sınıf" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TeacherId" class="form-label fw-bold"></label>
+                            <select asp-for="TeacherId" class="form-select" asp-items="ViewBag.Teachers">
+                                <option value="">-- Öğretmen Seçiniz (Opsiyonel) --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TargetUniversity" class="form-label fw-bold"></label>
+                        <input asp-for="TargetUniversity" class="form-control" placeholder="Örn: ODTÜ - Bilgisayar Mühendisliği" />
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Students" class="btn btn-outline-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,276 @@
+@model RehberlikSistemi.Web.Models.Student.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Öğrenci Paneli";
+}
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="mb-0">Merhaba @Model.StudentName, İyi Çalışmalar!</h2>
+                <p class="mb-0 text-white-50">Bugün harika şeyler başaracaksın. İşte haftalık hedeflerin.</p>
+                
+                @if(Model.TotalTasksCount > 0)
+                {
+                    <div class="mt-3">
+                        @{
+                            int progress = (int)((double)Model.CompletedTasksCount / Model.TotalTasksCount * 100);
+                        }
+                        <p class="mb-1 small">Haftalık İlerleme (@Model.CompletedTasksCount / @Model.TotalTasksCount)</p>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: @progress%;" aria-valuenow="@progress" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Takvim -->
+    <div class="col-12 mt-4">
+        <div class="card shadow-sm border-info h-100">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-light me-2 fw-bold" onclick="changeWeek(-1)" title="Önceki Hafta">&laquo; Önceki</button>
+                    <h5 class="mb-0 ms-1"><i class="bi bi-calendar-week"></i> <span id="calendar-title">Haftalık Takvimim</span></h5>
+                </div>
+                <div class="d-flex align-items-center">
+                    <small id="calendar-dates" class="me-3 fw-bold">Yükleniyor...</small>
+                    <button type="button" class="btn btn-sm btn-light fw-bold" onclick="changeWeek(1)" title="Sonraki Hafta">Sonraki &raquo;</button>
+                    <button type="button" class="btn btn-sm btn-outline-light ms-2 fw-bold" onclick="changeWeek(0)" title="Bugüne Dön">Bugün</button>
+                </div>
+            </div>
+            <div class="card-body p-2" id="calendar-body">
+                <div class="text-center py-5 text-muted">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <div class="mt-2">Takvim verisi yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentDateOffset = new Date('@Model.WeekStartDate.ToString("yyyy-MM-dd")T12:00:00'); 
+        const dayNames = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+        const csDaysMap = [1, 2, 3, 4, 5, 6, 0]; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchSchedule(currentDateOffset);
+        });
+
+        function changeWeek(direction) {
+            if (direction === 0) {
+                currentDateOffset = new Date();
+            } else {
+                currentDateOffset.setDate(currentDateOffset.getDate() + (direction * 7));
+            }
+            fetchSchedule(currentDateOffset);
+        }
+
+        function dtToString(d) {
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            let year = d.getFullYear();
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+            return [year, month, day].join('-');
+        }
+        
+        function formatShortDate(isoStr) {
+            let [y,m,d] = isoStr.split('-');
+            return `${d}.${m}`;
+        }
+        
+        function parseTime(t) {
+            let parts = t.split(':');
+            return new Date(1970,0,1, parts[0], parts[1]);
+        }
+        
+        function markTaskCompleted(taskId, btnEl) {
+            btnEl.disabled = true;
+            btnEl.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+            
+            fetch(`/Student/MarkTaskComplete?taskId=${taskId}&ajax=true`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    // Update visual immediately without fetching again
+                    let card = btnEl.closest('.task-card');
+                    card.classList.remove('bg-warning', 'border-warning');
+                    card.classList.add('bg-success', 'border-success');
+                    
+                    let txt = card.querySelector('.fw-bold');
+                    txt.classList.remove('text-dark');
+                    txt.classList.add('text-success');
+                    txt.innerHTML = `<i class="bi bi-check2-all"></i> ` + txt.innerText;
+                    
+                    btnEl.remove();
+                } else {
+                    alert("Görev güncellenemedi: " + (data.message || "Bilinmeyen hata"));
+                    btnEl.disabled = false;
+                    btnEl.innerText = "Tamamla";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("İşlem sırasında hata oluştu!");
+                btnEl.disabled = false;
+                btnEl.innerText = "Tamamla";
+            });
+        }
+
+        function generateCalendarHtml(data) {
+            let startDStr = data.weekStartDate;
+            let endDStr = data.weekEndDate;
+            let startD = new Date(startDStr + "T12:00:00");
+            
+            document.getElementById("calendar-dates").innerText = `${formatShortDate(startDStr)} - ${formatShortDate(endDStr)}`;
+            
+            let gridHtml = `<div class="row gx-2 h-100">`;
+            let todayStr = dtToString(new Date());
+
+            for (let i = 0; i < 7; i++) {
+                let cellDate = new Date(startD);
+                cellDate.setDate(cellDate.getDate() + i);
+                let cellDateStr = dtToString(cellDate);
+                
+                let isToday = (todayStr === cellDateStr);
+                let headerClass = isToday ? "bg-primary text-white shadow" : "bg-light";
+                let dayName = dayNames[cellDate.getDay()];
+                let currentSystemDay = csDaysMap[i];
+                
+                gridHtml += `
+                <div class="col" style="min-width: 120px;">
+                    <div class="card h-100 border-0 rounded-0" style="background-color: #fcfcfc;">
+                        <div class="card-header text-center p-1 ${headerClass}">
+                            <div class="fw-bold small">${dayName}</div>
+                            <div style="font-size: 0.75rem;">${formatShortDate(cellDateStr)}</div>
+                        </div>
+                        <div class="card-body p-1" style="overflow-y: auto; max-height: 500px;">
+                `;
+                
+                // Exams logic
+                let dayExams = data.exams.filter(e => e.date === cellDateStr).sort((a,b) => a.time.localeCompare(b.time));
+                if (dayExams.length > 0) {
+                     gridHtml += `<div class="fw-bold text-purple mb-1 mt-1 border-bottom pb-1" style="font-size: 0.7rem; color:#6f42c1;">Sınavlar:</div>`;
+                     for(let ex of dayExams) {
+                          gridHtml += `
+                          <div class="bg-purple bg-opacity-10 shadow-sm border rounded p-1 mb-2" style="font-size: 0.75rem; border-color: #6f42c1; background-color: #f3f0ff;">
+                              <div class="fw-bold" style="color:#6f42c1;">${ex.subjectName}</div>
+                              <div class="text-muted" style="font-size: 0.65rem;">${ex.time}</div>
+                          </div>`;
+                     }
+                }
+
+                let dayAvails = data.availabilities.filter(a => a.dayOfWeek === currentSystemDay && a.isAvailable).sort((a,b) => a.startTime.localeCompare(b.startTime));
+                let dayTasks = data.tasks.filter(t => t.date === cellDateStr).sort((a,b) => a.startTime.localeCompare(b.startTime));
+                
+                if (dayAvails.length === 0 && dayTasks.length === 0) {
+                    gridHtml += `<div class="text-muted text-center mt-3" style="font-size: 0.7rem; font-style: italic;">Müsaitlik Yok</div>`;
+                } else {
+                    for(let avail of dayAvails) {
+                        gridHtml += `
+                        <div class="mb-3">
+                            <div class="fw-bold border-bottom border-2 border-success text-success mb-2 pb-1" style="font-size: 0.75rem;">
+                                ${avail.startTime} - ${avail.endTime}
+                            </div>
+                        `;
+                        
+                        let aStart = parseTime(avail.startTime);
+                        let aEnd = parseTime(avail.endTime);
+                        
+                        let tasksInThisAvail = dayTasks.filter(t => {
+                            let tStart = parseTime(t.startTime);
+                            let tEnd = parseTime(t.endTime);
+                            return (tStart < aEnd && tEnd > aStart);
+                        });
+                        
+                        if (tasksInThisAvail.length > 0) {
+                            for(let t of tasksInThisAvail) {
+                                let isDone = t.status === "Completed";
+                                let bgClass = isDone ? "bg-success bg-opacity-25 border-success" : "bg-warning bg-opacity-25 border-warning";
+                                let txtClass = isDone ? "text-success" : "text-dark";
+                                
+                                gridHtml += `
+                                <div class="task-card ${bgClass} border rounded p-1 mb-1 shadow-sm" style="font-size: 0.75rem;">
+                                    <div class="fw-bold ${txtClass} text-truncate" title="${t.subjectName}">
+                                      ${isDone ? '<i class="bi bi-check2-all"></i>' : ''} ${t.subjectName}
+                                    </div>
+                                    <div class="text-muted mb-1" style="font-size: 0.65rem; white-space: nowrap;">${t.startTime}-${t.endTime}</div>
+                                    ${!isDone ? `<button class="btn btn-sm btn-outline-success p-0 w-100 fw-bold" style="font-size:0.65rem; height: 1.5rem;" onclick="markTaskCompleted(${t.id}, this)">Tamamla</button>` : ''}
+                                </div>
+                                `;
+                            }
+                        } else {
+                            gridHtml += `
+                            <div class="border border-success bg-opacity-10 text-success rounded p-1 text-center" style="font-size: 0.7rem; border-style: dashed !important;">
+                                Boş
+                            </div>
+                            `;
+                        }
+                        gridHtml += `</div>`; 
+                    }
+                    
+                    // Out of bounds tasks
+                    let outOfBoundsTasks = dayTasks.filter(t => {
+                        let tStart = parseTime(t.startTime);
+                        let tEnd = parseTime(t.endTime);
+                        return !dayAvails.some(a => {
+                            let aStart = parseTime(a.startTime);
+                            let aEnd = parseTime(a.endTime);
+                            return (tStart < aEnd && tEnd > aStart);
+                        });
+                    });
+                    
+                    if (outOfBoundsTasks.length > 0) {
+                         gridHtml += `<div class="fw-bold text-danger mt-2 mb-1 border-bottom border-danger pb-1" style="font-size: 0.75rem;">Müsaitlik Dışı:</div>`;
+                         for(let t of outOfBoundsTasks) {
+                            let isDone = t.status === "Completed";
+                             gridHtml += `
+                                <div class="task-card bg-danger bg-opacity-10 border border-danger rounded p-1 mb-1 shadow-sm" style="font-size: 0.75rem;">
+                                    <div class="fw-bold text-danger">
+                                        ${isDone ? '<i class="bi bi-check2-all"></i>' : ''} ${t.subjectName}
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.65rem;">${t.startTime}-${t.endTime}</div>
+                                    ${!isDone ? `<button class="btn btn-sm btn-outline-danger p-0 w-100 fw-bold mt-1" style="font-size:0.65rem; height: 1.5rem;" onclick="markTaskCompleted(${t.id}, this)">Tamamla</button>` : ''}
+                                </div>`;
+                         }
+                    }
+                }
+                
+                gridHtml += `
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
+            gridHtml += `</div>`;
+            return gridHtml;
+        }
+
+        function fetchSchedule(targetDate) {
+            let container = document.getElementById("calendar-body");
+            container.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <div class="mt-2">Takvim güncelleniyor...</div>
+                </div>`;
+                
+            let ds = dtToString(targetDate);
+            fetch(`/Student/GetMyWeeklySchedule?date=${ds}`)
+              .then(resp => resp.json())
+              .then(data => {
+                  container.innerHTML = generateCalendarHtml(data);
+              })
+              .catch(err => {
+                  console.error(err);
+                  container.innerHTML = `<div class="alert alert-danger m-3">Takvim yüklenirken hata oluştu.</div>`;
+              });
+        }
+    </script>
+}
