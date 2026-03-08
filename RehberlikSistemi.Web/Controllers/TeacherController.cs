@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RehberlikSistemi.Web.Core.Entities;
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Models.Teacher;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,11 +18,13 @@ namespace RehberlikSistemi.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDataProtector _protector;
 
-        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDataProtectionProvider dataProtectionProvider)
         {
             _context = context;
             _userManager = userManager;
+            _protector = dataProtectionProvider.CreateProtector("TeacherController.PlanGenerator");
         }
 
         public async Task<IActionResult> Dashboard()
@@ -695,7 +700,8 @@ namespace RehberlikSistemi.Web.Controllers
             
             // Serialize for POSTing later
             var plainTasks = proposedTasks.Select(t => new { t.SubjectId, t.ScheduledDate, t.StartTime, t.EndTime }).ToList();
-            model.SerializedTasks = System.Text.Json.JsonSerializer.Serialize(plainTasks);
+            var jsonStr = System.Text.Json.JsonSerializer.Serialize(plainTasks);
+            model.SerializedTasks = _protector.Protect(jsonStr);
 
             return View(model);
         }
@@ -722,23 +728,36 @@ namespace RehberlikSistemi.Web.Controllers
 
             if (!string.IsNullOrEmpty(model.SerializedTasks))
             {
-                // We use a small anonymous DTO to deserialize what we passed from the preview
-                var plainTasks = System.Text.Json.JsonSerializer.Deserialize<List<StudyTaskDto>>(model.SerializedTasks);
-                if (plainTasks != null)
+                try
                 {
-                    foreach (var pt in plainTasks)
+                    var unprotectedJson = _protector.Unprotect(model.SerializedTasks);
+                    var plainTasks = System.Text.Json.JsonSerializer.Deserialize<List<StudyTaskDto>>(unprotectedJson);
+                    if (plainTasks != null)
                     {
-                        _context.StudyTasks.Add(new StudyTask
+                        foreach (var pt in plainTasks)
                         {
-                            StudentId = model.ProfileId,
-                            SubjectId = pt.SubjectId,
-                            ScheduledDate = pt.ScheduledDate,
-                            StartTime = pt.StartTime,
-                            EndTime = pt.EndTime,
-                            Status = Core.Enums.StudyTaskStatus.Pending
-                        });
+                            _context.StudyTasks.Add(new StudyTask
+                            {
+                                StudentId = model.ProfileId,
+                                SubjectId = pt.SubjectId,
+                                ScheduledDate = pt.ScheduledDate,
+                                StartTime = pt.StartTime,
+                                EndTime = pt.EndTime,
+                                Status = Core.Enums.StudyTaskStatus.Pending
+                            });
+                        }
+                        await _context.SaveChangesAsync();
                     }
-                    await _context.SaveChangesAsync();
+                }
+                catch (System.Security.Cryptography.CryptographicException)
+                {
+                    // Tampered data
+                    return RedirectToAction(nameof(StudentDetail), new { id = model.ProfileId, msg = "Hata: Plan verisi geçersiz veya değiştirilmiş." });
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    // Malformed JSON data after unprotecting? Very unlikely unless data corruption, but we'll handle it
+                    return RedirectToAction(nameof(StudentDetail), new { id = model.ProfileId, msg = "Hata: Plan verisi geçersiz formata sahip." });
                 }
             }
 
