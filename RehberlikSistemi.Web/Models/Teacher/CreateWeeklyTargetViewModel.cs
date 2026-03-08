@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using RehberlikSistemi.Web.Extensions;
 
 namespace RehberlikSistemi.Web.Models.Teacher
 {
@@ -19,12 +20,6 @@ namespace RehberlikSistemi.Web.Models.Teacher
         [Required(ErrorMessage = "Hafta başlangıcı zorunludur.")]
         [DataType(DataType.Date)]
         [Display(Name = "Hafta Başlangıç Tarihi")]
-        public DateTime WeekStartDate { get; set; } = GetStartOfWeek(DateTime.Today);
-
-        private static DateTime GetStartOfWeek(DateTime dt)
-        {
-            int diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
-            return dt.AddDays(-1 * diff).Date;
-        }
+        public DateTime WeekStartDate { get; set; } = DateTime.Today.GetStartOfWeek();
     }
 }

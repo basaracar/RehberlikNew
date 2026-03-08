@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RehberlikSistemi.Web.Core.Entities;
 using RehberlikSistemi.Web.Data;
+using RehberlikSistemi.Web.Extensions;
 using RehberlikSistemi.Web.Models.Teacher;
 using System.Linq;
 using System.Threading.Tasks;
@@ -214,8 +215,7 @@ namespace RehberlikSistemi.Web.Controllers
             if (student == null) return NotFound();
 
             var today = DateTime.Today;
-            int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
-            var startOfWeek = today.AddDays(-1 * diff).Date;
+            var startOfWeek = today.GetStartOfWeek();
             var endOfWeek = startOfWeek.AddDays(6).Date.AddTicks(TimeSpan.TicksPerDay - 1);
 
             var model = new StudentDetailViewModel
@@ -375,8 +375,7 @@ namespace RehberlikSistemi.Web.Controllers
                 targetDate = DateTime.Today;
             }
 
-            int diff = (7 + (targetDate.DayOfWeek - DayOfWeek.Monday)) % 7;
-            var startOfWeek = targetDate.AddDays(-1 * diff).Date;
+            var startOfWeek = targetDate.GetStartOfWeek();
             var endOfWeek = startOfWeek.AddDays(6).Date.AddTicks(TimeSpan.TicksPerDay - 1);
 
             var tasks = await _context.StudyTasks
