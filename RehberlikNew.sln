@@ -6,10 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web", "RehberlikSistemi.Web\RehberlikSistemi.Web.csproj", "{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}"
 EndProject
 <<<<<<< HEAD
+<<<<<<< HEAD
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{919F0338-098B-4C2E-9A77-C08CDE89A732}"
 =======
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{66724AB1-E224-452E-A751-D57D8CF453C7}"
 >>>>>>> 19eb44a (🧪 add tests for TeacherController.PlanGenerator)
+=======
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{D36A87F5-979A-4B19-954A-BB6E5E5898BF}"
+>>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,7 @@ Global
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x64.Build.0 = Release|Any CPU
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x86.ActiveCfg = Release|Any CPU
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x86.Build.0 = Release|Any CPU
+<<<<<<< HEAD
 <<<<<<< HEAD
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -60,6 +65,20 @@ Global
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Release|x86.Build.0 = Release|Any CPU
 >>>>>>> 19eb44a (🧪 add tests for TeacherController.PlanGenerator)
+=======
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|x64.Build.0 = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|x86.Build.0 = Debug|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x64.ActiveCfg = Release|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x64.Build.0 = Release|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x86.ActiveCfg = Release|Any CPU
+		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x86.Build.0 = Release|Any CPU
+>>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
