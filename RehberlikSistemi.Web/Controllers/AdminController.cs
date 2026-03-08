@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RehberlikSistemi.Web.Core.Constants;
 using RehberlikSistemi.Web.Core.Entities;
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Models.Admin;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RehberlikSistemi.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Admin)]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,7 +38,7 @@ namespace RehberlikSistemi.Web.Controllers
         #region Teachers
         public async Task<IActionResult> Teachers()
         {
-            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            var teachers = await _userManager.GetUsersInRoleAsync(AppRoles.Teacher);
             return View(teachers);
         }
 
@@ -64,7 +65,7 @@ namespace RehberlikSistemi.Web.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password ?? "Ogretmen123!");
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Teacher");
+                    await _userManager.AddToRoleAsync(user, AppRoles.Teacher);
                     return RedirectToAction(nameof(Teachers));
                 }
 
@@ -99,7 +100,7 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateStudent()
         {
-            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            var teachers = await _userManager.GetUsersInRoleAsync(AppRoles.Teacher);
             ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
             return View(new StudentViewModel());
         }
@@ -121,7 +122,7 @@ namespace RehberlikSistemi.Web.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password ?? "Ogrenci123!");
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "Student");
+                    await _userManager.AddToRoleAsync(user, AppRoles.Student);
 
                     var studentProfile = new StudentProfile
                     {
@@ -141,7 +142,7 @@ namespace RehberlikSistemi.Web.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
             }
 
-            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            var teachers = await _userManager.GetUsersInRoleAsync(AppRoles.Teacher);
             ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName", model.TeacherId);
             return View(model);
         }
@@ -164,7 +165,7 @@ namespace RehberlikSistemi.Web.Controllers
                 TeacherId = profile.TeacherId
             };
 
-            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            var teachers = await _userManager.GetUsersInRoleAsync(AppRoles.Teacher);
             ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName", profile.TeacherId);
             return View(model);
         }

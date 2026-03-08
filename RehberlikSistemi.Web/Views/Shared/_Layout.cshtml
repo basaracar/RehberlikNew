@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using RehberlikSistemi.Web.Core.Constants
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,13 +17,13 @@
             <div class="container-fluid">
                  @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole(AppRoles.Admin))
                             {
                     <a class="navbar-brand" asp-controller="Admin" asp-action="Dashboard">RehberlikSistemi.Web</a>            }
-                            else if (User.IsInRole("Teacher"))
+                            else if (User.IsInRole(AppRoles.Teacher))
                             {
                     <a class="navbar-brand" asp-controller="Teacher" asp-action="Dashboard">RehberlikSistemi.Web</a>              }
-                            else if (User.IsInRole("Student"))
+                            else if (User.IsInRole(AppRoles.Student))
                             {
                     <a class="navbar-brand" asp-controller="Student" asp-action="Dashboard">RehberlikSistemi.Web</a>              }
                         }
@@ -35,19 +36,19 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole(AppRoles.Admin))
                             {
                                 <li class="nav-item"><a class="nav-link text-dark fw-bold" asp-controller="Admin" asp-action="Dashboard">Admin Paneli</a></li>
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Admin" asp-action="Teachers">Öğretmenler</a></li>
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Admin" asp-action="Students">Öğrenciler</a></li>
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Admin" asp-action="Subjects">Dersler</a></li>
                             }
-                            else if (User.IsInRole("Teacher"))
+                            else if (User.IsInRole(AppRoles.Teacher))
                             {
                                 <li class="nav-item"><a class="nav-link text-dark fw-bold" asp-controller="Teacher" asp-action="Dashboard">Öğretmen Paneli</a></li>
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Teacher" asp-action="Students">Öğrencilerim</a></li>
                             }
-                            else if (User.IsInRole("Student"))
+                            else if (User.IsInRole(AppRoles.Student))
                             {
                                 <li class="nav-item"><a class="nav-link text-dark fw-bold" asp-controller="Student" asp-action="Dashboard">Öğrenci Paneli</a></li>
                                 <li class="nav-item"><a class="nav-link text-dark" asp-controller="Student" asp-action="Availability">Müsaitlik Durumum</a></li>

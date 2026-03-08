@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using RehberlikSistemi.Web.Core.Constants;
 using RehberlikSistemi.Web.Core.Entities;
 using RehberlikSistemi.Web.Data;
 
@@ -16,7 +17,7 @@ namespace RehberlikSistemi.Web.Data
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
             // 1. Rollere Ekleme
-            string[] roles = { "Admin", "Teacher", "Student" };
+            string[] roles = { AppRoles.Admin, AppRoles.Teacher, AppRoles.Student };
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
@@ -38,7 +39,7 @@ namespace RehberlikSistemi.Web.Data
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(newAdmin, "Admin123!");
-                await userManager.AddToRoleAsync(newAdmin, "Admin");
+                await userManager.AddToRoleAsync(newAdmin, AppRoles.Admin);
             }
 
             // 3. Örnek Öğretmen Ekleme
@@ -54,7 +55,7 @@ namespace RehberlikSistemi.Web.Data
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(newTeacher, "Teacher123!");
-                await userManager.AddToRoleAsync(newTeacher, "Teacher");
+                await userManager.AddToRoleAsync(newTeacher, AppRoles.Teacher);
                 teacherUser = newTeacher;
             }
 
@@ -71,7 +72,7 @@ namespace RehberlikSistemi.Web.Data
                     EmailConfirmed = true
                 };
                 await userManager.CreateAsync(newStudent, "Student123!");
-                await userManager.AddToRoleAsync(newStudent, "Student");
+                await userManager.AddToRoleAsync(newStudent, AppRoles.Student);
                 studentUser = newStudent;
             }
 
