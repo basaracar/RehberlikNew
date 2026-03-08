@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
@@ -12,6 +13,8 @@ using System.Threading.Tasks;
 >>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
 =======
 >>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +24,9 @@ using RehberlikSistemi.Web.Controllers;
 using RehberlikSistemi.Web.Core.Entities;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Models.Teacher;
 using System;
@@ -28,6 +34,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+<<<<<<< HEAD
 =======
 using RehberlikSistemi.Web.Core.Enums;
 using RehberlikSistemi.Web.Data;
@@ -37,12 +44,17 @@ using RehberlikSistemi.Web.Models.Teacher;
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Models.Teacher;
 >>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
 using Xunit;
 
 namespace RehberlikSistemi.Web.Tests.Controllers
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
     public class TeacherControllerTests
     {
         private ApplicationDbContext GetDbContext()
@@ -94,6 +106,7 @@ namespace RehberlikSistemi.Web.Tests.Controllers
 
             // Act
             var result = await controller.PlanGenerator(1);
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
@@ -182,6 +195,8 @@ namespace RehberlikSistemi.Web.Tests.Controllers
             // Act
             var result = await _controller.Dashboard();
 >>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -189,6 +204,9 @@ namespace RehberlikSistemi.Web.Tests.Controllers
 
         [Fact]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
         public async Task PlanGenerator_StudentNotFound_ReturnsNotFound()
         {
             // Arrange
@@ -436,6 +454,7 @@ namespace RehberlikSistemi.Web.Tests.Controllers
             Assert.Equal(3, model.ProposedTasks.Count);
 
             Assert.All(model.ProposedTasks, t => Assert.Equal(2, t.SubjectId));
+<<<<<<< HEAD
 =======
         public async Task Dashboard_ValidUser_ReturnsCorrectViewModel()
         {
@@ -691,6 +710,8 @@ namespace RehberlikSistemi.Web.Tests.Controllers
             Assert.Contains("Öğrenci seçilen saat aralığında müsait değil", redirectResult.RouteValues?["msg"]?.ToString());
             Assert.False(_controller.ModelState.IsValid);
 >>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
+=======
+>>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
         }
     }
 }
