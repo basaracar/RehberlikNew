@@ -22,12 +22,27 @@ namespace RehberlikSistemi.Web.Controllers
             _userManager = userManager;
         }
 
+        private async Task<ApplicationUser?> GetCurrentUserAsync()
+        {
+            return await _userManager.GetUserAsync(User);
+        }
+
+        private string? GetCurrentUserId()
+        {
+            return _userManager.GetUserId(User);
+        }
+
+        private async Task<StudentProfile?> GetStudentProfileByUserIdAsync(string userId)
+        {
+            return await _context.StudentProfiles.FirstOrDefaultAsync(sp => sp.UserId == userId);
+        }
+
         public async Task<IActionResult> Dashboard()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await GetCurrentUserAsync();
             if (user == null) return NotFound();
 
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+            var studentProfile = await GetStudentProfileByUserIdAsync(user.Id);
             if (studentProfile == null) return NotFound();
 
             // Calculate current week's start (Monday) and end (Sunday)
@@ -59,12 +74,12 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> MarkTaskComplete(int taskId, [FromQuery] bool ajax = false)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
 
             var task = await _context.StudyTasks
                 .Include(t => t.Student)
-                .FirstOrDefaultAsync(t => t.Id == taskId && t.Student.UserId == user.Id);
+                .FirstOrDefaultAsync(t => t.Id == taskId && t.Student.UserId == userId);
 
             if (task != null)
             {
@@ -84,14 +99,14 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMyWeeklySchedule([FromQuery] string date)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
 
             var studentProfile = await _context.StudentProfiles
                 .Include(sp => sp.Availabilities)
                 .Include(sp => sp.Exams).ThenInclude(e => e.Subject)
                 .Include(sp => sp.StudyTasks).ThenInclude(t => t.Subject)
-                .FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.UserId == userId);
 
             if (studentProfile == null) return NotFound();
 
@@ -147,12 +162,12 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Availability()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var studentProfile = await _context.StudentProfiles
                 .Include(sp => sp.Availabilities)
-                .FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.UserId == userId);
 
             if (studentProfile == null) return NotFound();
 
@@ -167,10 +182,10 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAvailability(StudentAvailabilityViewModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(sp => sp.UserId == user.Id);
+            var studentProfile = await GetStudentProfileByUserIdAsync(userId);
             if (studentProfile == null) return NotFound();
 
             var availability = new Availability
@@ -191,12 +206,12 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteAvailability(int id)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var availability = await _context.Availabilities
                 .Include(a => a.Student)
-                .FirstOrDefaultAsync(a => a.Id == id && a.Student.UserId == user.Id);
+                .FirstOrDefaultAsync(a => a.Id == id && a.Student.UserId == userId);
 
             if (availability != null)
             {
