@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RehberlikSistemi.Web.Core.Constants;
 using RehberlikSistemi.Web.Core.Entities;
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Extensions;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RehberlikSistemi.Web.Controllers
 {
-    [Authorize(Roles = "Student")]
+    [Authorize(Roles = AppRoles.Student)]
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;

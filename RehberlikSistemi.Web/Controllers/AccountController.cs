@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RehberlikSistemi.Web.Core.Constants;
 using RehberlikSistemi.Web.Core.Entities;
 using System.Threading.Tasks;
 
@@ -50,15 +51,15 @@ namespace RehberlikSistemi.Web.Controllers
 
         private IActionResult RedirectToDashboard()
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole(AppRoles.Admin))
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
-            else if (User.IsInRole("Teacher"))
+            else if (User.IsInRole(AppRoles.Teacher))
             {
                 return RedirectToAction("Dashboard", "Teacher");
             }
-            else if (User.IsInRole("Student"))
+            else if (User.IsInRole(AppRoles.Student))
             {
                 return RedirectToAction("Dashboard", "Student");
             }
