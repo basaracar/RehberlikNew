@@ -1,61 +1,7 @@
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-
-
-
-
-
-
-
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
-  <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-
-
-
-
-
-
-
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-
-
-
-=======
->>>>>>> origin/fix/teacher-controller-assign-student-tests-7726696823679279214
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-=======
->>>>>>> origin/fix/teacher-controller-assign-student-tests-7726696823679279214
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -63,47 +9,16 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
-<<<<<<< HEAD
-
-
-
-
-
-
-
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
-
-
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.2" />
-
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
-
-
-
-
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
-
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.2" />
-
-
-
-
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
-
-
-
-
-=======
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.2" />
->>>>>>> origin/fix/teacher-controller-assign-student-tests-7726696823679279214
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
