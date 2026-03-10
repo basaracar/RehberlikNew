@@ -5,33 +5,37 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web", "RehberlikSistemi.Web\RehberlikSistemi.Web.csproj", "{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}"
 EndProject
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
+
+
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{919F0338-098B-4C2E-9A77-C08CDE89A732}"
-=======
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{66724AB1-E224-452E-A751-D57D8CF453C7}"
->>>>>>> 19eb44a (🧪 add tests for TeacherController.PlanGenerator)
-=======
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{D36A87F5-979A-4B19-954A-BB6E5E5898BF}"
->>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
-=======
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}"
->>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
-=======
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{66724AB1-E224-452E-A751-D57D8CF453C7}"
->>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
-=======
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{66724AB1-E224-452E-A751-D57D8CF453C7}"
-=======
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{D36A87F5-979A-4B19-954A-BB6E5E5898BF}"
->>>>>>> origin/fix/teacher-controller-dashboard-test-13469410257360173807
-=======
+
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}"
->>>>>>> origin/test/teacher-controller-create-study-task-8328421172636092499
->>>>>>> cf8150e309825dd1bffceffc1f0b10a4d14eb370
+
+
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}"
+
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,11 +59,12 @@ Global
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x64.Build.0 = Release|Any CPU
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x86.ActiveCfg = Release|Any CPU
 		{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}.Release|x86.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
+
+
+
+
+
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -72,11 +77,11 @@ Global
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Release|x64.Build.0 = Release|Any CPU
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Release|x86.ActiveCfg = Release|Any CPU
 		{919F0338-098B-4C2E-9A77-C08CDE89A732}.Release|x86.Build.0 = Release|Any CPU
-=======
-=======
->>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
-=======
->>>>>>> cf8150e309825dd1bffceffc1f0b10a4d14eb370
+
+
+
+
+
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -89,12 +94,12 @@ Global
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Release|x64.Build.0 = Release|Any CPU
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{66724AB1-E224-452E-A751-D57D8CF453C7}.Release|x86.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 19eb44a (🧪 add tests for TeacherController.PlanGenerator)
-=======
->>>>>>> cf8150e309825dd1bffceffc1f0b10a4d14eb370
-=======
+
+
+
+
+
+
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -107,12 +112,12 @@ Global
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x64.Build.0 = Release|Any CPU
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{D36A87F5-979A-4B19-954A-BB6E5E5898BF}.Release|x86.Build.0 = Release|Any CPU
-<<<<<<< HEAD
->>>>>>> 9a81442 (🧪 Add test for TeacherController.Dashboard)
-=======
->>>>>>> origin/fix/teacher-controller-dashboard-test-13469410257360173807
->>>>>>> cf8150e309825dd1bffceffc1f0b10a4d14eb370
-=======
+
+
+
+
+
+
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -125,13 +130,27 @@ Global
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Release|x64.Build.0 = Release|Any CPU
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Release|x86.ActiveCfg = Release|Any CPU
 		{B0F63BCE-ADA9-42B7-ABBB-1178AE499EC5}.Release|x86.Build.0 = Release|Any CPU
-<<<<<<< HEAD
->>>>>>> cd5e533 (Add tests for TeacherController.CreateStudyTask)
-=======
->>>>>>> tests/teacher-controller-plangenerator-3108397973037746152
-=======
->>>>>>> origin/test/teacher-controller-create-study-task-8328421172636092499
->>>>>>> cf8150e309825dd1bffceffc1f0b10a4d14eb370
+
+
+
+
+
+
+
+
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|x64.Build.0 = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Debug|x86.Build.0 = Debug|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|x64.ActiveCfg = Release|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|x64.Build.0 = Release|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|x86.ActiveCfg = Release|Any CPU
+		{B8D37871-DFBE-4DA1-8CA9-7E994A3EA331}.Release|x86.Build.0 = Release|Any CPU
+
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
