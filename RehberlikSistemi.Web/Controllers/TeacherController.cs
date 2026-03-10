@@ -26,9 +26,19 @@ namespace RehberlikSistemi.Web.Controllers
             _planService = planService;
         }
 
+        private async Task<ApplicationUser?> GetCurrentUserAsync()
+        {
+            return await _userManager.GetUserAsync(User);
+        }
+
+        private string? GetCurrentUserId()
+        {
+            return _userManager.GetUserId(User);
+        }
+
         public async Task<IActionResult> Dashboard()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await GetCurrentUserAsync();
             if (user == null) return NotFound();
 
             var students = await _context.StudentProfiles
@@ -98,12 +108,12 @@ namespace RehberlikSistemi.Web.Controllers
 
         public async Task<IActionResult> Students()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var students = await _context.StudentProfiles
                 .Include(sp => sp.User)
-                .Where(sp => sp.TeacherId == user.Id)
+                .Where(sp => sp.TeacherId == userId)
                 .Select(sp => new TeacherStudentViewModel
                 {
                     ProfileId = sp.Id,
@@ -134,15 +144,15 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignStudent(int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var student = await _context.StudentProfiles.FindAsync(profileId);
             if (student == null) return NotFound();
 
             if (string.IsNullOrEmpty(student.TeacherId))
             {
-                student.TeacherId = user.Id;
+                student.TeacherId = userId;
                 await _context.SaveChangesAsync();
             }
 
@@ -152,12 +162,12 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EditStudent(int id) // ProfileId
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var studentProfile = await _context.StudentProfiles
                 .Include(sp => sp.User)
-                .FirstOrDefaultAsync(sp => sp.Id == id && sp.TeacherId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.Id == id && sp.TeacherId == userId);
 
             if (studentProfile == null) return NotFound();
 
@@ -179,12 +189,12 @@ namespace RehberlikSistemi.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return NotFound();
+                var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
 
                 var studentProfile = await _context.StudentProfiles
                     .Include(sp => sp.User)
-                    .FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == user.Id);
+                    .FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == userId);
 
                 if (studentProfile == null) return NotFound();
 
@@ -204,8 +214,8 @@ namespace RehberlikSistemi.Web.Controllers
 
         public async Task<IActionResult> StudentDetail(int id, string? msg = null)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var student = await _context.StudentProfiles
                 .Include(sp => sp.User)
@@ -213,7 +223,7 @@ namespace RehberlikSistemi.Web.Controllers
                 .Include(sp => sp.Exams).ThenInclude(e => e.Subject)
                 .Include(sp => sp.WeeklyTargets).ThenInclude(w => w.Subject)
                 .Include(sp => sp.StudyTasks).ThenInclude(t => t.Subject)
-                .FirstOrDefaultAsync(sp => sp.Id == id && sp.TeacherId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.Id == id && sp.TeacherId == userId);
 
             if (student == null) return NotFound();
 
@@ -289,11 +299,11 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> SetExamScore(int id, int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var exam = await _context.Exams.Include(e => e.Subject)
-                .FirstOrDefaultAsync(e => e.Id == id && e.StudentId == profileId && e.Student.TeacherId == user.Id);
+                .FirstOrDefaultAsync(e => e.Id == id && e.StudentId == profileId && e.Student.TeacherId == userId);
             
             if (exam == null) return NotFound();
 
@@ -313,11 +323,11 @@ namespace RehberlikSistemi.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return NotFound();
+                var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
 
                 var exam = await _context.Exams.Include(e => e.Student)
-                    .FirstOrDefaultAsync(e => e.Id == model.ExamId && e.StudentId == model.ProfileId && e.Student.TeacherId == user.Id);
+                    .FirstOrDefaultAsync(e => e.Id == model.ExamId && e.StudentId == model.ProfileId && e.Student.TeacherId == userId);
                 
                 if (exam != null)
                 {
@@ -364,12 +374,12 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetWeeklySchedule(int profileId, [FromQuery] string date)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
 
             var student = await _context.StudentProfiles
                 .Include(sp => sp.Availabilities)
-                .FirstOrDefaultAsync(sp => sp.Id == profileId && sp.TeacherId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.Id == profileId && sp.TeacherId == userId);
                 
             if (student == null) return NotFound();
 
@@ -426,10 +436,10 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteExam(int id, int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
-            var exam = await _context.Exams.Include(e => e.Student).FirstOrDefaultAsync(e => e.Id == id && e.StudentId == profileId && e.Student.TeacherId == user.Id);
+            var exam = await _context.Exams.Include(e => e.Student).FirstOrDefaultAsync(e => e.Id == id && e.StudentId == profileId && e.Student.TeacherId == userId);
             if (exam != null)
             {
                 _context.Exams.Remove(exam);
@@ -441,10 +451,10 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteWeeklyTarget(int id, int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
-            var target = await _context.WeeklyTargets.Include(w => w.Student).FirstOrDefaultAsync(w => w.Id == id && w.StudentId == profileId && w.Student.TeacherId == user.Id);
+            var target = await _context.WeeklyTargets.Include(w => w.Student).FirstOrDefaultAsync(w => w.Id == id && w.StudentId == profileId && w.Student.TeacherId == userId);
             if (target != null)
             {
                 _context.WeeklyTargets.Remove(target);
@@ -458,12 +468,12 @@ namespace RehberlikSistemi.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return NotFound();
+                var userId = GetCurrentUserId();
+                if (userId == null) return NotFound();
 
                 var student = await _context.StudentProfiles
                     .Include(sp => sp.Availabilities)
-                    .FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == user.Id);
+                    .FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == userId);
 
                 if (student == null) return NotFound();
 
@@ -524,10 +534,10 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteStudyTask(int id, int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
-            var task = await _context.StudyTasks.Include(t => t.Student).FirstOrDefaultAsync(t => t.Id == id && t.StudentId == profileId && t.Student.TeacherId == user.Id);
+            var task = await _context.StudyTasks.Include(t => t.Student).FirstOrDefaultAsync(t => t.Id == id && t.StudentId == profileId && t.Student.TeacherId == userId);
             
             if (task != null)
             {
@@ -545,13 +555,13 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ClearDayTasks(DateTime date, int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var tasks = await _context.StudyTasks
                 .Include(t => t.Student)
                 .Where(t => t.StudentId == profileId && 
-                           t.Student.TeacherId == user.Id && 
+                           t.Student.TeacherId == userId &&
                            t.ScheduledDate.Date == date.Date &&
                            t.Status == Core.Enums.StudyTaskStatus.Pending &&
                            t.ScheduledDate.Date > DateTime.Today)
@@ -570,14 +580,14 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> PlanGenerator(int profileId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
             var student = await _context.StudentProfiles
                 .Include(sp => sp.User)
                 .Include(sp => sp.Availabilities)
                 .Include(sp => sp.Exams).ThenInclude(e => e.Subject)
-                .FirstOrDefaultAsync(sp => sp.Id == profileId && sp.TeacherId == user.Id);
+                .FirstOrDefaultAsync(sp => sp.Id == profileId && sp.TeacherId == userId);
 
             if (student == null) return NotFound();
 
@@ -625,10 +635,10 @@ namespace RehberlikSistemi.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveGeneratedPlan(PlanGeneratorViewModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var userId = GetCurrentUserId();
+            if (userId == null) return NotFound();
 
-            var student = await _context.StudentProfiles.FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == user.Id);
+            var student = await _context.StudentProfiles.FirstOrDefaultAsync(sp => sp.Id == model.ProfileId && sp.TeacherId == userId);
             if (student == null) return NotFound();
 
             // Safety Check: Re-verify if any tasks were added in the meantime
