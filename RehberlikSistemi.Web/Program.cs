@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<RehberlikSistemi.Web.Services.IPlanGenerationService, RehberlikSistemi.Web.Services.PlanGenerationService>();
 
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
