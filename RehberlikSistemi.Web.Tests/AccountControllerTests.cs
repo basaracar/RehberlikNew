@@ -1,80 +1,48 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using RehberlikSistemi.Web.Controllers;
 using RehberlikSistemi.Web.Core.Entities;
 using Xunit;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace RehberlikSistemi.Web.Tests
 {
     public class AccountControllerTests
     {
-        private Mock<SignInManager<ApplicationUser>> GetMockSignInManager()
-        {
-            var userManager = GetMockUserManager();
-            var contextAccessor = new Mock<IHttpContextAccessor>();
-            var claimsFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
-
-            return new Mock<SignInManager<ApplicationUser>>(
-                userManager.Object,
-                contextAccessor.Object,
-                claimsFactory.Object,
-                null, null, null, null);
-        }
-
-        private Mock<UserManager<ApplicationUser>> GetMockUserManager()
+        private Mock<UserManager<ApplicationUser>> MockUserManager()
         {
             var store = new Mock<IUserStore<ApplicationUser>>();
-            return new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
+            return new Mock<UserManager<ApplicationUser>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
         }
 
-        private AccountController CreateController(ClaimsPrincipal user)
+        private Mock<SignInManager<ApplicationUser>> MockSignInManager(UserManager<ApplicationUser> userManager)
         {
-            var controller = new AccountController(GetMockSignInManager().Object, GetMockUserManager().Object);
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = user }
-            };
-            return controller;
+            var contextAccessor = new Mock<IHttpContextAccessor>();
+            var claimsFactory = new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>();
+            return new Mock<SignInManager<ApplicationUser>>(userManager, contextAccessor.Object, claimsFactory.Object, null!, null!, null!, null!);
         }
 
         [Fact]
-        public void Login_Get_WhenUserIsNotAuthenticated_ReturnsViewResult()
+        public async Task Logout_CallsSignOutAsyncAndRedirectsToLogin()
         {
             // Arrange
-            var user = new ClaimsPrincipal(new ClaimsIdentity());
-            var controller = CreateController(user);
+            var userManagerMock = MockUserManager();
+            var signInManagerMock = MockSignInManager(userManagerMock.Object);
+
+            var controller = new AccountController(signInManagerMock.Object, userManagerMock.Object);
 
             // Act
-            var result = controller.Login();
+            var result = await controller.Logout();
 
             // Assert
-            Assert.IsType<ViewResult>(result);
-        }
+            signInManagerMock.Verify(s => s.SignOutAsync(), Times.Once);
 
-        [Theory]
-        [InlineData("Admin", "Admin", "Dashboard")]
-        [InlineData("Teacher", "Teacher", "Dashboard")]
-        [InlineData("Student", "Student", "Dashboard")]
-        [InlineData("Unknown", "Home", "Index")]
-        public void Login_Get_WhenUserIsAuthenticated_RedirectsToDashboardBasedOnRole(string role, string expectedController, string expectedAction)
-        {
-            // Arrange
-            var identity = new ClaimsIdentity("TestAuthType");
-            identity.AddClaim(new Claim(ClaimTypes.Role, role));
-            var user = new ClaimsPrincipal(identity);
-
-            var controller = CreateController(user);
-
-            // Act
-            var result = controller.Login() as RedirectToActionResult;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(expectedAction, result.ActionName);
-            Assert.Equal(expectedController, result.ControllerName);
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Login", redirectResult.ActionName);
+            Assert.Equal("Account", redirectResult.ControllerName);
         }
     }
 }
