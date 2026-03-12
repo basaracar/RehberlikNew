@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using RehberlikSistemi.Web.Controllers;
 using RehberlikSistemi.Web.Core.Entities;
+using RehberlikSistemi.Web.Core.Enums;
 using RehberlikSistemi.Web.Data;
 using RehberlikSistemi.Web.Models.Admin;
 using Xunit;
@@ -122,6 +123,109 @@ namespace RehberlikSistemi.Web.Tests.Controllers
             Assert.False(controller.ModelState.IsValid);
             Assert.Contains(controller.ModelState.Values.SelectMany(v => v.Errors), e => e.ErrorMessage == "Password too weak");
             Assert.NotNull(controller.ViewBag.Teachers);
+        }
+
+        [Fact]
+        public async Task EditSubject_Get_ValidId_ReturnsViewWithSubject()
+        {
+            // Arrange
+            var subject = new Subject { Name = "Matematik", SubjectType = SubjectType.Sayisal };
+            _dbContext.Subjects.Add(subject);
+            await _dbContext.SaveChangesAsync();
+
+            var controller = new AdminController(_dbContext, _mockUserManager.Object);
+
+            // Act
+            var result = await controller.EditSubject(subject.Id);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsType<Subject>(viewResult.Model);
+            Assert.Equal("Matematik", model.Name);
+            Assert.Equal(SubjectType.Sayisal, model.SubjectType);
+        }
+
+        [Fact]
+        public async Task EditSubject_Post_ValidModel_UpdatesAndRedirects()
+        {
+            // Arrange
+            var subject = new Subject { Name = "Matematik", SubjectType = SubjectType.Sayisal };
+            _dbContext.Subjects.Add(subject);
+            await _dbContext.SaveChangesAsync();
+
+            var controller = new AdminController(_dbContext, _mockUserManager.Object);
+            var model = new Subject { Id = subject.Id, Name = "Fizik", SubjectType = SubjectType.Sayisal };
+
+            // Act
+            var result = await controller.EditSubject(model);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Subjects", redirectResult.ActionName);
+
+            var updated = await _dbContext.Subjects.FindAsync(subject.Id);
+            Assert.Equal("Fizik", updated!.Name);
+        }
+
+        [Fact]
+        public async Task DeleteSubject_NoAssignment_DeletesAndRedirects()
+        {
+            // Arrange
+            var subject = new Subject { Name = "Matematik", SubjectType = SubjectType.Sayisal };
+            _dbContext.Subjects.Add(subject);
+            await _dbContext.SaveChangesAsync();
+
+            var controller = new AdminController(_dbContext, _mockUserManager.Object);
+
+            // Act
+            var result = await controller.DeleteSubject(subject.Id);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Subjects", redirectResult.ActionName);
+            Assert.Null(await _dbContext.Subjects.FindAsync(subject.Id));
+        }
+
+        [Fact]
+        public async Task DeleteSubject_HasStudyTask_ReturnsErrorAndDoesNotDelete()
+        {
+            // Arrange
+            var subject = new Subject { Name = "Matematik", SubjectType = SubjectType.Sayisal };
+            _dbContext.Subjects.Add(subject);
+
+            var profile = new StudentProfile
+            {
+                UserId = "student1",
+                GradeLevel = "10",
+                TargetUniversity = "Test"
+            };
+            _dbContext.StudentProfiles.Add(profile);
+            await _dbContext.SaveChangesAsync();
+
+            var task = new StudyTask
+            {
+                SubjectId = subject.Id,
+                StudentId = profile.Id,
+                ScheduledDate = System.DateTime.Today,
+                StartTime = System.TimeSpan.FromHours(10),
+                EndTime = System.TimeSpan.FromHours(11)
+            };
+            _dbContext.StudyTasks.Add(task);
+            await _dbContext.SaveChangesAsync();
+
+            var controller = new AdminController(_dbContext, _mockUserManager.Object);
+            controller.TempData = new Microsoft.AspNetCore.Mvc.ViewFeatures.TempDataDictionary(
+                new Microsoft.AspNetCore.Http.DefaultHttpContext(),
+                Mock.Of<Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataProvider>());
+
+            // Act
+            var result = await controller.DeleteSubject(subject.Id);
+
+            // Assert
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Subjects", redirectResult.ActionName);
+            Assert.NotNull(await _dbContext.Subjects.FindAsync(subject.Id)); // Subject should NOT be deleted
+            Assert.Equal("Bu ders öğrencilere atanmış olduğu için silinemez.", controller.TempData["Error"]);
         }
     }
 }

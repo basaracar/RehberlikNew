@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RehberlikSistemi.Web.Core.Entities;
+using RehberlikSistemi.Web.Extensions;
 
 namespace RehberlikSistemi.Web.Services
 {
@@ -57,12 +58,13 @@ namespace RehberlikSistemi.Web.Services
             // Shuffle or just cycle through the pool sequentially (which groups high priority ones first)
             int poolIndex = 0;
 
-            // Generate tasks for the next 7 days
+            // Generate tasks for the next week (Monday to Sunday)
             var proposedTasks = new List<StudyTask>();
+            var nextMonday = currentDate.Date.GetStartOfWeek().AddDays(7);
 
-            for (int i = 1; i <= 7; i++)
+            for (int i = 0; i < 7; i++)
             {
-                var targetDay = currentDate.Date.AddDays(i);
+                var targetDay = nextMonday.AddDays(i);
                 var dayOfWeek = targetDay.DayOfWeek;
 
                 var availabilities = student.Availabilities.Where(a => a.DayOfWeek == dayOfWeek && a.IsAvailable).ToList();

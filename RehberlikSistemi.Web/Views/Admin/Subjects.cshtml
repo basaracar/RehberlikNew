@@ -2,6 +2,15 @@
 @model IEnumerable<Subject>
 @{
     ViewData["Title"] = "Dersler";
+    var hasAssignment = ViewBag.HasAssignment as Dictionary<int, bool> ?? new Dictionary<int, bool>();
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 
 <div class="row">
@@ -27,6 +36,7 @@
                             <tr><td colspan="4" class="text-center text-muted">Sistemde tanımlı ders bulunamadı.</td></tr>
                         }
                         @foreach(var s in Model) {
+                            var isAssigned = hasAssignment.ContainsKey(s.Id) && hasAssignment[s.Id];
                             <tr>
                                 <td>@s.Id</td>
                                 <td><strong>@s.Name</strong></td>
@@ -34,7 +44,19 @@
                                     @s.SubjectType
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>Sil</button>
+                                    <a asp-action="EditSubject" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary me-1">Düzenle</a>
+                                    @if (isAssigned)
+                                    {
+                                        <button class="btn btn-sm btn-outline-danger" disabled
+                                                title="Bu ders öğrencilere atanmış olduğu için silinemez">Sil</button>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="DeleteSubject" asp-route-id="@s.Id" method="post" style="display:inline"
+                                              onsubmit="return confirm('Bu dersi silmek istediğinize emin misiniz?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                         }

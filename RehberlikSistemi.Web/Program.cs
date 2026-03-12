@@ -9,10 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<RehberlikSistemi.Web.Services.IPlanGenerationService, RehberlikSistemi.Web.Services.PlanGenerationService>();
 
+#if DEBUG
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+#else
+// Database connection
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ProductionConnection")));
+#endif
 // Identity configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

@@ -20,12 +20,14 @@ namespace RehberlikSistemi.Web.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPlanGenerationService _planService;
+        private readonly IDataProtector _protector;
 
-        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IPlanGenerationService planService)
+        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IPlanGenerationService planService, IDataProtectionProvider provider)
         {
             _context = context;
             _userManager = userManager;
             _planService = planService;
+            _protector = provider.CreateProtector("TeacherController.PlanGenerator");
         }
 
         private async Task<ApplicationUser?> GetCurrentUserAsync()
@@ -600,11 +602,12 @@ namespace RehberlikSistemi.Web.Controllers
             };
 
             var currentDate = System.DateTime.Now;
-            var next7Days = currentDate.Date.AddDays(7);
+            var nextMonday = currentDate.Date.GetStartOfWeek().AddDays(7);
+            var nextSunday = nextMonday.AddDays(6);
             
-            // Step: Check if any plan already exists for the next week
+            // Step: Check if any plan already exists for the next week (Monday-Sunday)
             var existingTasks = await _context.StudyTasks
-                .AnyAsync(t => t.StudentId == profileId && t.ScheduledDate >= currentDate.Date && t.ScheduledDate <= next7Days);
+                .AnyAsync(t => t.StudentId == profileId && t.ScheduledDate >= nextMonday && t.ScheduledDate <= nextSunday);
 
             if (existingTasks)
             {
@@ -646,9 +649,10 @@ namespace RehberlikSistemi.Web.Controllers
 
             // Safety Check: Re-verify if any tasks were added in the meantime
             var currentDate = System.DateTime.Now.Date;
-            var next7Days = currentDate.AddDays(7);
+            var nextMonday = currentDate.GetStartOfWeek().AddDays(7);
+            var nextSunday = nextMonday.AddDays(6);
             var alreadyHasTasks = await _context.StudyTasks
-                .AnyAsync(t => t.StudentId == model.ProfileId && t.ScheduledDate >= currentDate && t.ScheduledDate <= next7Days);
+                .AnyAsync(t => t.StudentId == model.ProfileId && t.ScheduledDate >= nextMonday && t.ScheduledDate <= nextSunday);
             
             if (alreadyHasTasks)
             {

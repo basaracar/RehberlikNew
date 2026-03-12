@@ -192,7 +192,16 @@ namespace RehberlikSistemi.Web.Controllers
         #region Subjects
         public async Task<IActionResult> Subjects()
         {
-            var subjects = await _context.Subjects.ToListAsync();
+            var subjects = await _context.Subjects
+                .Include(s => s.StudyTasks)
+                .Include(s => s.WeeklyTargets)
+                .Include(s => s.Exams)
+                .ToListAsync();
+
+            ViewBag.HasAssignment = subjects.ToDictionary(
+                s => s.Id,
+                s => s.StudyTasks.Any() || s.WeeklyTargets.Any() || s.Exams.Any());
+
             return View(subjects);
         }
 
@@ -212,6 +221,52 @@ namespace RehberlikSistemi.Web.Controllers
                 return RedirectToAction(nameof(Subjects));
             }
             return View(subject);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditSubject(int id)
+        {
+            var subject = await _context.Subjects.FindAsync(id);
+            if (subject == null) return NotFound();
+            return View(subject);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditSubject(Subject model)
+        {
+            if (ModelState.IsValid)
+            {
+                var subject = await _context.Subjects.FindAsync(model.Id);
+                if (subject == null) return NotFound();
+
+                subject.Name = model.Name;
+                subject.SubjectType = model.SubjectType;
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Subjects));
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteSubject(int id)
+        {
+            var subject = await _context.Subjects
+                .Include(s => s.StudyTasks)
+                .Include(s => s.WeeklyTargets)
+                .Include(s => s.Exams)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (subject == null) return NotFound();
+
+            if (subject.StudyTasks.Any() || subject.WeeklyTargets.Any() || subject.Exams.Any())
+            {
+                TempData["Error"] = "Bu ders öğrencilere atanmış olduğu için silinemez.";
+                return RedirectToAction(nameof(Subjects));
+            }
+
+            _context.Subjects.Remove(subject);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Subjects));
         }
         #endregion
     }

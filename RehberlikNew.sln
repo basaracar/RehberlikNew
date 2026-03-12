@@ -5,11 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web", "RehberlikSistemi.Web\RehberlikSistemi.Web.csproj", "{9E2D58B4-CBE5-4618-9271-E3DFC1C60C0F}"
 EndProject
-<<<<<<< HEAD
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{08B5FDDC-47E6-4088-9AB3-A6FAEE3D0B1A}"
-=======
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RehberlikSistemi.Web.Tests", "RehberlikSistemi.Web.Tests\RehberlikSistemi.Web.Tests.csproj", "{27030A3A-3EBE-4F77-82A8-80E4DFCADB0C}"
->>>>>>> origin/testing-improvement-student-controller-2888079067300223416
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
