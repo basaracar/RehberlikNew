@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<RehberlikSistemi.Web.Services.IPlanGenerationService, RehberlikSistemi.Web.Services.PlanGenerationService>();
+builder.Services.AddHealthChecks();
 
 #if DEBUG
 // Database connection
@@ -53,6 +54,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapHealthChecks("/health");
 
 app.MapControllerRoute(
     name: "default",

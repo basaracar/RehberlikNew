@@ -8,14 +8,14 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["RehberlikSistemi.Web/RehberlikSistemi.Web.csproj", "./"]
+COPY ["RehberlikSistemi.Web/RehberlikSistemi.Web.csproj", "RehberlikSistemi.Web/"]
 RUN dotnet restore "RehberlikSistemi.Web/RehberlikSistemi.Web.csproj"
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "RehberlikSistemi.Web/RehberlikSistemi.Web.csproj" -c Release -o /app/build
+WORKDIR "/src/RehberlikSistemi.Web"
+RUN dotnet build "RehberlikSistemi.Web.csproj" -c Release -o /app/build --no-restore
 
 FROM build AS publish
-RUN dotnet publish "RehberlikSistemi.Web/RehberlikSistemi.Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "RehberlikSistemi.Web.csproj" -c Release -o /app/publish --no-restore
 
 FROM base AS final
 WORKDIR /app
