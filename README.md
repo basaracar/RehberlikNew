@@ -1,64 +1,64 @@
-# Rehberlik Sistemi (Counseling System)
+# Rehberlik Sistemi
 
-## Overview
-Rehberlik Sistemi is a web-based counseling and guidance management system built with ASP.NET Core 9.0. It provides a platform for managing student counseling activities, facilitating communication between administrators, teachers, and students.
+## Genel Bakış
+Rehberlik Sistemi, ASP.NET Core 9.0 ile geliştirilmiş web tabanlı bir rehberlik ve danışmanlık yönetim sistemidir. Yöneticiler, öğretmenler ve öğrenciler arasındaki iletişimi kolaylaştıran, öğrenci rehberlik faaliyetlerinin yönetilmesini sağlayan kapsamlı bir platform sunar.
 
-## Key Features
-* **Role-Based Access Control:** Secure authentication and authorization using ASP.NET Core Identity with predefined roles:
-  * **Admin:** Full system access, user management, and configuration.
-  * **Teacher (Counselor):** Access to student records, ability to manage counseling sessions and notes.
-  * **Student:** Access to personal counseling history and communication with counselors.
-* **Database Management:** Utilizes Entity Framework Core 9.0 with SQL Server for robust data storage and retrieval.
-* **Modern Web Interface:** Built with ASP.NET Core MVC, providing a responsive and user-friendly experience.
+## Temel Özellikler
+* **Rol Tabanlı Erişim Kontrolü:** ASP.NET Core Identity kullanılarak güvenli kimlik doğrulama ve yetkilendirme sağlanır. Önceden tanımlanmış roller:
+  * **Yönetici (Admin):** Tam sistem erişimi, kullanıcı yönetimi ve yapılandırma işlemleri.
+  * **Öğretmen (Rehber):** Öğrenci kayıtlarına erişim, rehberlik oturumları ve notların yönetimi.
+  * **Öğrenci:** Kişisel rehberlik geçmişine erişim ve rehber öğretmenlerle iletişim.
+* **Veritabanı Yönetimi:** Güçlü veri depolama ve sorgulama için Entity Framework Core 9.0 ve SQL Server kullanılmaktadır.
+* **Modern Web Arayüzü:** ASP.NET Core MVC ile oluşturulmuş, duyarlı (responsive) ve kullanıcı dostu bir deneyim sunar.
 
-## Technologies Used
+## Kullanılan Teknolojiler
 * **Backend:** ASP.NET Core 9.0 (MVC)
 * **ORM:** Entity Framework Core 9.0
-* **Database:** Microsoft SQL Server
-* **Authentication/Authorization:** ASP.NET Core Identity
+* **Veritabanı:** Microsoft SQL Server
+* **Kimlik Doğrulama / Yetkilendirme:** ASP.NET Core Identity
 * **Frontend:** HTML, CSS, JavaScript (Razor Views)
 
-## Project Structure
-* `Controllers/`: Contains the MVC controllers handling user requests (e.g., `AdminController`, `TeacherController`, `StudentController`, `AccountController`).
-* `Core/`: Includes core business logic, entities, and interfaces.
-* `Data/`: Contains the Entity Framework `ApplicationDbContext` and database seeding logic.
-* `Models/`: Data transfer objects (DTOs) and view models used across the application.
-* `Views/`: Razor views for rendering the UI.
-* `wwwroot/`: Static assets such as CSS, JavaScript, and images.
+## Proje Yapısı
+* `Controllers/`: Kullanıcı isteklerini işleyen MVC denetleyicilerini içerir (örn: `AdminController`, `TeacherController`, `StudentController`, `AccountController`).
+* `Core/`: Temel iş mantığı, varlık (entity) sınıfları ve arayüzleri (interface) barındırır.
+* `Data/`: Entity Framework `ApplicationDbContext` ve veritabanı tohumlama (seeding) mantığını içerir.
+* `Models/`: Uygulama genelinde kullanılan veri transfer nesneleri (DTO) ve görünüm modelleri (view model) yer alır.
+* `Views/`: Kullanıcı arayüzünü oluşturan Razor görünüm dosyalarını içerir.
+* `wwwroot/`: CSS, JavaScript ve görseller gibi statik dosyaları barındırır.
 
-## Getting Started
+## Başlarken
 
-### Prerequisites
+### Ön Gereksinimler
 * [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-* SQL Server (LocalDB or a dedicated instance)
+* SQL Server (LocalDB veya ayrı bir sunucu)
 
-### Installation & Setup
-1. **Clone the repository:**
+### Kurulum ve Yapılandırma
+1. **Depoyu klonlayın:**
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone <depo-adresi>
+   cd <depo-dizini>
    ```
 
-2. **Configure the Database Connection:**
-   Open `RehberlikSistemi.Web/appsettings.Development.json` (or `appsettings.json`) and update the `DefaultConnection` string to point to your SQL Server instance.
+2. **Veritabanı Bağlantısını Yapılandırın:**
+   `RehberlikSistemi.Web/appsettings.Development.json` (veya `appsettings.json`) dosyasını açarak `DefaultConnection` bağlantı dizesini kendi SQL Server sunucunuza göre güncelleyin.
 
-3. **Apply Database Migrations:**
-   Navigate to the project directory and run the Entity Framework Core migrations to create the database schema:
+3. **Veritabanı Migrasyonlarını Uygulayın:**
+   Proje dizinine gidin ve veritabanı şemasını oluşturmak için Entity Framework Core migrasyonlarını çalıştırın:
    ```bash
    cd RehberlikSistemi.Web
    dotnet ef database update
    ```
-   *Note: If you don't have the EF Core CLI tools installed, you can install them globally using `dotnet tool install --global dotnet-ef`.*
+   *Not: EF Core CLI araçları yüklü değilse, `dotnet tool install --global dotnet-ef` komutuyla global olarak yükleyebilirsiniz.*
 
-4. **Run the Application:**
-   Start the application using the .NET CLI:
+4. **Uygulamayı Çalıştırın:**
+   .NET CLI kullanarak uygulamayı başlatın:
    ```bash
    dotnet run
    ```
-   The application will start, and you can access it via the URL provided in the console output (typically `https://localhost:5001` or `http://localhost:5000`).
+   Uygulama başlatıldıktan sonra, konsol çıktısında belirtilen adres üzerinden erişebilirsiniz (genellikle `https://localhost:5001` veya `http://localhost:5000`).
 
-### Default Users (Seeded)
-The application may seed default users and roles upon the first run. Please check `DbSeeder.SeedRolesAndUsersAsync` in `Program.cs` for the specific credentials created during initialization.
+### Varsayılan Kullanıcılar (Tohumlanmış)
+Uygulama ilk çalıştırmada varsayılan kullanıcıları ve rolleri otomatik olarak oluşturabilir. Başlangıçta tanımlanan kullanıcı bilgileri için `Program.cs` dosyasındaki `DbSeeder.SeedRolesAndUsersAsync` metodunu inceleyebilirsiniz.
 
-## License
-[Add License Information Here]
+## Lisans
+[Lisans bilgisi buraya eklenecektir]
